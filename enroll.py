@@ -10,7 +10,6 @@ driver.get("http://enroll-me.iiet.pl/")
 time.sleep(2)
 content = driver.find_element_by_xpath(
     '/html/body/div[2]/div[2]/form/div[4]/div/div/button[2]')
-print(content)
 content.click()
 
 login = driver.find_element_by_xpath('//*[@id="student_username"]')
@@ -26,6 +25,11 @@ enrollment_button = driver.find_element_by_xpath(
     '/html/body/div[1]/div/div[2]/div[2]/a')
 enrollment_button.click()
 
+time.sleep(2)
 all_plans = driver.find_element_by_xpath(
     '//*[@id="mainForm:j_id_x:tbody_element"]')
-print(all_plans)
+rows = all_plans.find_elements_by_css_selector('tr')
+for index, row in enumerate(rows):
+    col = row.find_elements_by_css_selector('td')[0]
+    semester = col.find_element_by_css_selector('h5')
+    print(str(index) + ') ' + semester.text)
