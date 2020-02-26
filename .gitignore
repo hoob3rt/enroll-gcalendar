@@ -7,6 +7,8 @@ __pycache__/
 *.json
 # C extensions
 *.so
+google_credentials/credentials.json
+google_credentials/token.pickle
 
 # Distribution / packaging
 .Python
