@@ -9,6 +9,9 @@ DRIVER = None
 DAYS_LOCATIONS = {}
 
 
+# TODO zmienic stringi na enkapsulacje zmiennych
+
+
 def connect():
     '''
         establish connection to enroll-me.iiet.pl
@@ -24,47 +27,51 @@ def connect():
 
 
 def get_day_locations():
+    '''
+        TODO
+    '''
     global DAYS_LOCATIONS
-
-    DAYS_LOCATIONS['monday'] = {'start': int(
-        DRIVER.find_elements_by_class_name('fc-mon')[-1].location['x']),
+    DAYS_LOCATIONS['monday'] = {
+        'start': int(DRIVER.find_elements_by_class_name(
+            'fc-mon')[-1].location['x']),
+        'middle': int(DRIVER.find_elements_by_class_name(
+            'fc-mon')[-1].location['x']) + int(
+                DRIVER.find_elements_by_class_name(
+                    'fc-mon')[-1].size['width']/2)
+    }
+    DAYS_LOCATIONS['tuesday'] = {
+        'start': int(DRIVER.find_elements_by_class_name(
+            'fc-tue')[-1].location['x']),
+        'middle': int(DRIVER.find_elements_by_class_name(
+            'fc-tue')[-1].location['x']) + int(
+                DRIVER.find_elements_by_class_name(
+                    'fc-tue')[-1].size['width']/2)
+    }
+    DAYS_LOCATIONS['wednesday'] = {
+        'start': int(DRIVER.find_elements_by_class_name(
+            'fc-wed')[-1].location['x']),
+        'middle': int(DRIVER.find_elements_by_class_name(
+            'fc-wed')[-1].location['x']) + int(
+                DRIVER.find_elements_by_class_name(
+                    'fc-wed')[-1].size['width']/2)
+    }
+    DAYS_LOCATIONS['thursday'] = {
+        'start': int(DRIVER.find_elements_by_class_name(
+            'fc-thu')[-1].location['x']),
+        'middle': int(DRIVER.find_elements_by_class_name(
+            'fc-thu')[-1].location['x']) + int(
+                DRIVER.find_elements_by_class_name(
+                    'fc-thu')[-1].size['width']/2)
+    }
+    DAYS_LOCATIONS['friday'] = {
+        'start': int(DRIVER.find_elements_by_class_name(
+            'fc-fri')[-1].location['x']),
         'middle':
         int(DRIVER.find_elements_by_class_name(
-            'fc-mon')[-1].location['x'])
-        +
-        int(DRIVER.find_elements_by_class_name('fc-mon')[-1].size['width']/2)}
-
-    DAYS_LOCATIONS['tuesday'] = {'start': int(
-        DRIVER.find_elements_by_class_name('fc-tue')[-1].location['x']),
-        'middle':
-        int(DRIVER.find_elements_by_class_name(
-            'fc-tue')[-1].location['x'])
-        +
-        int(DRIVER.find_elements_by_class_name('fc-tue')[-1].size['width']/2)}
-
-    DAYS_LOCATIONS['wednesday'] = {'start': int(
-        DRIVER.find_elements_by_class_name('fc-wed')[-1].location['x']),
-        'middle':
-        int(DRIVER.find_elements_by_class_name(
-            'fc-wed')[-1].location['x'])
-        +
-        int(DRIVER.find_elements_by_class_name('fc-wed')[-1].size['width']/2)}
-
-    DAYS_LOCATIONS['thursday'] = {'start': int(
-        DRIVER.find_elements_by_class_name('fc-thu')[-1].location['x']),
-        'middle':
-        int(DRIVER.find_elements_by_class_name(
-            'fc-thu')[-1].location['x'])
-        +
-        int(DRIVER.find_elements_by_class_name('fc-thu')[-1].size['width']/2)}
-
-    DAYS_LOCATIONS['friday'] = {'start': int(
-        DRIVER.find_elements_by_class_name('fc-fri')[-1].location['x']),
-        'middle':
-        int(DRIVER.find_elements_by_class_name(
-            'fc-fri')[-1].location['x'])
-        +
-        int(DRIVER.find_elements_by_class_name('fc-fri')[-1].size['width']/2)}
+            'fc-fri')[-1].location['x']) + int(
+                DRIVER.find_elements_by_class_name(
+                    'fc-fri')[-1].size['width']/2)
+    }
 
 
 def find_class_day(class_location):
@@ -88,18 +95,18 @@ def find_class_day(class_location):
     return class_day
 
 
-def get_classes_from_semester(selected_semester, semesters, warunki):
+def get_classes_from_semester(selected_semester, semesters, warunki,
+                              all_classes):
     number = selected_semester[0].split(' ')[0]
     for index in semesters:
         if semesters[index][0].split(
-            ' ')[0] == number and int(semesters[index][0].split(
-                ' ')[1]) == int(selected_semester[0].split(' ')[1])-2:
+                ' ')[0] == number and int(semesters[index][0].split(
+                    ' ')[1]) == int(selected_semester[0].split(' ')[1])-2:
             warunki.append((semesters[index][0], semesters[index][1]))
     btn = selected_semester[1].find_elements_by_css_selector('td')[-1]
     b = btn.find_element_by_css_selector('div')
     b.click()
     time.sleep(2)
-    classes = []
     lessons = DRIVER.find_elements_by_class_name('fc-event-inner')
     for lesson in lessons:
         get_day_locations()
@@ -111,16 +118,18 @@ def get_classes_from_semester(selected_semester, semesters, warunki):
         date = date.text.strip()
         classname = title.text.split(',')[0].strip()
         dude = title.text.split(',')[1].strip()
-        room = title.text.split(',')[2].strip()
+        try:
+            room = title.text.split(',')[2].strip()
+        except IndexError:
+            room = dude
+            dude = ''
         try:
             class_type = title.text.split(',')[3].strip().split('-')[-1]
         except IndexError:
             class_type = room.split('-')[-1].strip()
             room = room.split('-')[0].strip()
-        classes.append((date, classname, dude, room, class_type,
-                        find_class_day(lesson.location['x'])))
-    for clas in classes:
-        print(clas)
+        all_classes.append((date, classname, dude, room, class_type,
+                            find_class_day(lesson.location['x'])))
 
 
 def click_enrollment_button():
@@ -170,6 +179,7 @@ def rest():
     time.sleep(2)
     login()
     click_enrollment_button()
+    all_classes = []
 
     time.sleep(2)
     semesters = fetch_available_semesters(print_available_semesters=True)
@@ -185,7 +195,8 @@ def rest():
     except IndexError:
         print('please select correct semester index')
 
-    get_classes_from_semester(selected_semester, semesters, warunki)
+    get_classes_from_semester(selected_semester, semesters, warunki,
+                              all_classes)
     if len(warunki) > 0:
         for index, warunek in enumerate(warunki):
             print(str(index) + ') ' + warunek[0])
@@ -204,7 +215,9 @@ def rest():
             for semester in semesters:
                 if warunek[0] == semesters[semester][0]:
                     get_classes_from_semester(semesters[semester],
-                                              semesters, warunki)
+                                              semesters, warunki, all_classes)
+    for clas in all_classes:
+        print(clas)
 
 
 if __name__ == "__main__":
