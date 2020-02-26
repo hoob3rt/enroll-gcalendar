@@ -10,6 +10,7 @@ DAYS_LOCATIONS = {}
 
 
 # TODO zmienic stringi na enkapsulacje zmiennych
+# TODO add wait until available
 
 
 def connect():
@@ -174,40 +175,36 @@ def fetch_available_semesters(print_available_semesters=False):
     return semesters
 
 
-def rest():
-    print('fetching semesters')
-    time.sleep(2)
-    login()
-    click_enrollment_button()
+def get_classes_from_selected_semesters(username, password):
     all_classes = []
+    warunki = []
 
+    time.sleep(2)
+    print('fetching semesters')
+    login(username, password)
+    click_enrollment_button()
     time.sleep(2)
     semesters = fetch_available_semesters(print_available_semesters=True)
-
-    print('select semester index')
     try:
-        selected_semester_index = int(input())
+        selected_semester_index = int(input('select semester index'))
     except ValueError:
         raise Exception('no semester selected')
-    warunki = []
     try:
         selected_semester = list(semesters.values())[selected_semester_index]
     except IndexError:
-        print('please select correct semester index')
-
+        print('please select correct semester index\n')
     get_classes_from_semester(selected_semester, semesters, warunki,
                               all_classes)
     if len(warunki) > 0:
         for index, warunek in enumerate(warunki):
             print(str(index) + ') ' + warunek[0])
-        print('select warunek to exclude, empty excludes none')
         try:
-            selected_semester_index = int(input())
+            selected_semester_index = int(input('select warunek to exclude,\
+                                                empty excludes none\n'))
         except ValueError:
             selected_semester_index = None
         if selected_semester_index is not None:
             del warunki[selected_semester_index]
-            # remove provided index
         click_enrollment_button()
         time.sleep(1)
         semesters = fetch_available_semesters()
@@ -216,12 +213,14 @@ def rest():
                 if warunek[0] == semesters[semester][0]:
                     get_classes_from_semester(semesters[semester],
                                               semesters, warunki, all_classes)
-    for clas in all_classes:
-        print(clas)
+    return all_classes
 
 
-if __name__ == "__main__":
-    connect()
-    rest()
+def close_driver():
     DRIVER.close()
-    pass
+
+
+def main(username, password):
+    connect()
+    get_classes_from_selected_semesters(username, password)
+    close_driver()

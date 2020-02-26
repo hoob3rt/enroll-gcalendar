@@ -12,16 +12,14 @@ from googleapiclient.discovery import build
 SCOPES = ['https://www.googleapis.com/auth/calendar.events']
 
 
-def main():
-    """Shows basic usage of the Google Calendar API.
-    Prints the start and name of the next 10 events on the user's calendar.
-    """
+def create_events():
+    pass
+
+
+def evaluate_credentials():
     creds = None
-    # The file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
     if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+        with open('../google_credentials/token.pickle', 'rb') as token:
             creds = pickle.load(token)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -29,11 +27,22 @@ def main():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                '../google_credentials/credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
+        with open('../google_credentials/token.pickle', 'wb') as token:
             pickle.dump(creds, token)
+    return creds
+
+
+def main():
+    """Shows basic usage of the Google Calendar API.
+    Prints the start and name of the next 10 events on the user's calendar.
+    """
+    creds = evaluate_credentials()
+    # The file token.pickle stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
 
     service = build('calendar', 'v3', credentials=creds)
 
@@ -51,7 +60,6 @@ def main():
         }
     }
     # event = service.events().insert(calendarId='primary', body=event).execute()
-
 
     # Call the Calendar API
     now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
