@@ -25,21 +25,46 @@ def connect():
 
 def get_day_locations():
     global DAYS_LOCATIONS
-    DAYS_LOCATIONS[
-        int(DRIVER.find_elements_by_class_name('fc-mon')[-1].location['x'])
-    ] = 'monday'
-    DAYS_LOCATIONS[
-        DRIVER.find_elements_by_class_name('fc-tue')[-1].location['x']
-    ] = 'tuesday'
-    DAYS_LOCATIONS[
-        DRIVER.find_elements_by_class_name('fc-wed')[-1].location['x']
-    ] = 'wednesday'
-    DAYS_LOCATIONS[
-        DRIVER.find_elements_by_class_name('fc-thu')[-1].location['x']
-    ] = 'thursday'
-    DAYS_LOCATIONS[
-        DRIVER.find_elements_by_class_name('fc-fri')[-1].location['x']
-    ] = 'friday'
+
+    DAYS_LOCATIONS['monday'] = {'start': int(
+        DRIVER.find_elements_by_class_name('fc-mon')[-1].location['x']),
+        'middle':
+        int(DRIVER.find_elements_by_class_name(
+            'fc-mon')[-1].location['x'])
+        +
+        int(DRIVER.find_elements_by_class_name('fc-mon')[-1].size['width']/2)}
+
+    DAYS_LOCATIONS['tuesday'] = {'start': int(
+        DRIVER.find_elements_by_class_name('fc-tue')[-1].location['x']),
+        'middle':
+        int(DRIVER.find_elements_by_class_name(
+            'fc-tue')[-1].location['x'])
+        +
+        int(DRIVER.find_elements_by_class_name('fc-tue')[-1].size['width']/2)}
+
+    DAYS_LOCATIONS['wednesday'] = {'start': int(
+        DRIVER.find_elements_by_class_name('fc-wed')[-1].location['x']),
+        'middle':
+        int(DRIVER.find_elements_by_class_name(
+            'fc-wed')[-1].location['x'])
+        +
+        int(DRIVER.find_elements_by_class_name('fc-wed')[-1].size['width']/2)}
+
+    DAYS_LOCATIONS['thursday'] = {'start': int(
+        DRIVER.find_elements_by_class_name('fc-thu')[-1].location['x']),
+        'middle':
+        int(DRIVER.find_elements_by_class_name(
+            'fc-thu')[-1].location['x'])
+        +
+        int(DRIVER.find_elements_by_class_name('fc-thu')[-1].size['width']/2)}
+
+    DAYS_LOCATIONS['friday'] = {'start': int(
+        DRIVER.find_elements_by_class_name('fc-fri')[-1].location['x']),
+        'middle':
+        int(DRIVER.find_elements_by_class_name(
+            'fc-fri')[-1].location['x'])
+        +
+        int(DRIVER.find_elements_by_class_name('fc-fri')[-1].size['width']/2)}
 
 
 def find_class_day(class_location):
@@ -50,12 +75,17 @@ def find_class_day(class_location):
         class_location to each day_location
     '''
     min_distance = maxsize
-    day = ''
-    for day_location in DAYS_LOCATIONS:
-        if abs(day_location-class_location) < min_distance:
-            min_distance = abs(day_location-class_location)
-            day = DAYS_LOCATIONS[day_location]
-    return day
+    class_day = ''
+    for day in DAYS_LOCATIONS:
+        day_location_start = DAYS_LOCATIONS[day]['start']
+        day_location_middle = DAYS_LOCATIONS[day]['middle']
+        if abs(day_location_start - class_location) < min_distance:
+            min_distance = abs(day_location_start - class_location)
+            class_day = day
+        if abs(day_location_middle - class_location) < min_distance:
+            min_distance = abs(day_location_middle - class_location)
+            class_day = day
+    return class_day
 
 
 def get_classes_from_semester(selected_semester, semesters, warunki):
@@ -68,12 +98,8 @@ def get_classes_from_semester(selected_semester, semesters, warunki):
     btn = selected_semester[1].find_elements_by_css_selector('td')[-1]
     b = btn.find_element_by_css_selector('div')
     b.click()
-
     time.sleep(2)
     classes = []
-    tek = DRIVER.find_elements_by_class_name('fc-mon')[-1]
-    print(tek.location)
-
     lessons = DRIVER.find_elements_by_class_name('fc-event-inner')
     for lesson in lessons:
         get_day_locations()
