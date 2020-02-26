@@ -175,7 +175,10 @@ def rest():
     semesters = fetch_available_semesters(print_available_semesters=True)
 
     print('select semester index')
-    selected_semester_index = int(input())
+    try:
+        selected_semester_index = int(input())
+    except ValueError:
+        raise Exception('no semester selected')
     warunki = []
     try:
         selected_semester = list(semesters.values())[selected_semester_index]
@@ -187,7 +190,10 @@ def rest():
         for index, warunek in enumerate(warunki):
             print(str(index) + ') ' + warunek[0])
         print('select warunek to exclude, empty excludes none')
-        selected_semester_index = int(input())
+        try:
+            selected_semester_index = int(input())
+        except ValueError:
+            selected_semester_index = None
         if selected_semester_index is not None:
             del warunki[selected_semester_index]
             # remove provided index
