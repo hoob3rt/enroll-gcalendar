@@ -181,12 +181,13 @@ def get_classes_from_selected_semesters(username, password):
 
     time.sleep(2)
     print('fetching semesters')
+    time.sleep(1)
     login(username, password)
     click_enrollment_button()
     time.sleep(2)
     semesters = fetch_available_semesters(print_available_semesters=True)
     try:
-        selected_semester_index = int(input('select semester index'))
+        selected_semester_index = int(input('select semester index: '))
     except ValueError:
         raise Exception('no semester selected')
     try:
@@ -199,8 +200,8 @@ def get_classes_from_selected_semesters(username, password):
         for index, warunek in enumerate(warunki):
             print(str(index) + ') ' + warunek[0])
         try:
-            selected_semester_index = int(input('select warunek to exclude,\
-                                                empty excludes none\n'))
+            selected_semester_index = int(input(
+                'select warunek to exclude(empty excludes none): '))
         except ValueError:
             selected_semester_index = None
         if selected_semester_index is not None:
