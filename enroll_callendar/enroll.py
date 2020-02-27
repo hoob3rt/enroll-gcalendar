@@ -1,8 +1,9 @@
-import time
-from sys import maxsize
 import os
+import time
+from sys import exit, maxsize
 
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
@@ -10,8 +11,7 @@ DRIVER = None
 DAYS_LOCATIONS = {}
 
 
-# TODO zmienic stringi na enkapsulacje zmiennych
-# TODO add wait until available
+# TODO add wait until available based on command line argument
 
 
 def connect():
@@ -22,6 +22,7 @@ def connect():
     options = Options()
     options.headless = True
     DRIVER = webdriver.Firefox(options=options)
+    # DRIVER.implicitly_wait(5)
     # DRIVER = webdriver.Firefox()
     print('headless Firefox initialized')
     print('connecting to http://enroll-me.iiet.pl/')
@@ -108,7 +109,6 @@ def get_classes_from_semester(selected_semester, semesters, warunki,
     btn = selected_semester[1].find_elements_by_css_selector('td')[-1]
     b = btn.find_element_by_css_selector('div')
     b.click()
-    time.sleep(2)
     lessons = DRIVER.find_elements_by_class_name('fc-event-inner')
     for lesson in lessons:
         get_day_locations()
@@ -139,9 +139,14 @@ def click_enrollment_button():
     """
         return to enrollment page
     """
-    enrollment_button = DRIVER.find_element_by_xpath(
-        '/html/body/div[1]/div/div[2]/div[2]/a')
-    enrollment_button.click()
+    try:
+        enrollment_button = DRIVER.find_element_by_xpath(
+            '/html/body/div[1]/div/div[2]/div[2]/a')
+        enrollment_button.click()
+    except NoSuchElementException:
+        print(
+            'fetching semesters failed, possibly due to wrong login info')
+        exit(1)
 
 
 def login(username, password):
@@ -180,12 +185,9 @@ def fetch_available_semesters(print_available_semesters=False):
 def get_classes_from_selected_semesters(username, password):
     all_classes = []
     warunki = []
-    time.sleep(2)
     print('fetching semesters')
-    time.sleep(1)
     login(username, password)
     click_enrollment_button()
-    time.sleep(2)
     semesters = fetch_available_semesters(print_available_semesters=True)
     try:
         selected_semester_index = int(input('select semester index: '))
@@ -197,7 +199,7 @@ def get_classes_from_selected_semesters(username, password):
         print('please select correct semester index\n')
     get_classes_from_semester(selected_semester, semesters, warunki,
                               all_classes)
-    if len(warunki) == 100:
+    if len(warunki) > 0:
         for index, warunek in enumerate(warunki):
             print(f'{index}) {warunek[0]}')
         try:
@@ -208,7 +210,6 @@ def get_classes_from_selected_semesters(username, password):
         if selected_semester_index is not None:
             del warunki[selected_semester_index]
         click_enrollment_button()
-        time.sleep(1)
         semesters = fetch_available_semesters()
         for warunek in warunki:
             for semester in semesters:
@@ -244,7 +245,7 @@ def print_classes_by_day(all_classes, sort_classes=False, print_indices=False):
     os.system('cls' if os.name == 'nt' else 'clear')  # clear screen
     if sort_classes:
         sort_classes_by_day(all_classes)
-    print('')
+    print('current plan:\n')
     for day in DAYS_LOCATIONS:
         print(day.capitalize())
         for index, clas in enumerate(all_classes):
@@ -256,28 +257,24 @@ def print_classes_by_day(all_classes, sort_classes=False, print_indices=False):
         print('')
 
 
-def remove_classes(all_classes, print_welcome_message=True):
+def remove_classes(all_classes):
     """
         removes all classes selected by user
     """
-    if print_welcome_message:
-        choice = input('select index to remove, -1 removes all lecutres(W)')
-    else:
-        choice = input()
+    choice = input('select index to remove, -1 removes all lecutres(W): ')
     if int(choice) == -1:
         all_classes = [clss for clss in all_classes if clss[-2] != 'W']
         print_classes_by_day(
             all_classes, sort_classes=True, print_indices=True)
     else:
-        try:
+        if int(choice) > len(all_classes):
+            print('provided index too big')
+        else:
             all_classes = [clss for index, clss in enumerate(all_classes)
                            if index != int(choice)]
             print_classes_by_day(
                 all_classes, sort_classes=True, print_indices=True)
-        except IndexError:
-            print('enter correct index')
-            all_classes = remove_classes(
-                all_classes, print_welcome_message=False)
+
     continue_deleting = input('continue removing? [y/N]')
     if continue_deleting.lower() == 'y':
         all_classes = remove_classes(all_classes)
