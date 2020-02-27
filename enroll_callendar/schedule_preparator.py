@@ -12,6 +12,7 @@ def sort_classes_by_day(all_classes):
     for day in DAYS_LOCATIONS:
         for clas in all_classes:
             if clas[-1] == day:
+                # print(clas)
                 sorted_classes.append(clas)
     return sorted_classes
 
@@ -22,14 +23,14 @@ def print_classes_by_day(all_classes, sort_classes=False, print_indices=False):
     """
     os.system('cls' if os.name == 'nt' else 'clear')  # clear screen
     if sort_classes:
-        sort_classes_by_day(all_classes)
+        all_classes = sort_classes_by_day(all_classes)
     print('current plan:\n')
     for day in DAYS_LOCATIONS:
         print(day.capitalize())
         for index, clas in enumerate(all_classes):
             if clas[-1] == day:
                 if print_indices:
-                    print(f'{index}) {clas[0:-1]}')
+                    print(f'{index}) {clas}')
                 else:
                     print(clas[0:-1])
         print('')
@@ -41,9 +42,10 @@ def remove_classes(all_classes):
     """
     choice = input('select index to remove, -1 removes all lecutres(W): ')
     if int(choice) == -1:
-        all_classes = [clss for clss in all_classes if clss[-2] != 'W']
+        all_classes = [clss for clss in all_classes if clss[-3] != 'W']
         print_classes_by_day(
             all_classes, sort_classes=True, print_indices=True)
+        print(all_classes)
     else:
         if int(choice) > len(all_classes):
             print('provided index too big')
@@ -52,7 +54,6 @@ def remove_classes(all_classes):
                            if index != int(choice)]
             print_classes_by_day(
                 all_classes, sort_classes=True, print_indices=True)
-
     continue_deleting = input('continue removing? [y/N]')
     if continue_deleting.lower() == 'y':
         all_classes = remove_classes(all_classes)
@@ -71,5 +72,20 @@ def find_next_weekday(start_date, weekday=0):
     return start_date
 
 
-def convert_to_gcalendar_format(all_classes):
-    pass
+def convert_to_gcalendar_event(lesson):
+    event = {
+        'summary': f'{lesson[1]} - {lesson[-3]}',
+        'location': f'{lesson[-4]}',
+        'description': f'{lesson[-2]}',
+        'start': {
+            'dateTime': '',
+            'timeZone': 'Europe/Warsaw',
+        },
+        'end': {
+            'timeZone': 'Europe/Warsaw'
+        },
+        "recurrence": [
+            "RRULE:FREQ=WEEKLY;UNTIL=20110617T065959Z",
+        ]
+    }
+    return event
