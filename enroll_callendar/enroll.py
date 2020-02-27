@@ -1,5 +1,6 @@
 import time
 from sys import maxsize
+import os
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -125,7 +126,8 @@ def get_classes_from_semester(selected_semester, semesters, warunki,
             room = dude
             dude = ''
         try:
-            class_type = title.text.split(',')[3].strip().split('-')[-1]
+            class_type = title.text.split(
+                ',')[3].strip().split('-')[-1].strip()
         except IndexError:
             class_type = room.split('-')[-1].strip()
             room = room.split('-')[0].strip()
@@ -171,14 +173,13 @@ def fetch_available_semesters(print_available_semesters=False):
         semester = col.find_element_by_css_selector('h5')
         semesters[index] = (semester.text, row)
         if print_available_semesters:
-            print(str(index) + ') ' + semester.text)
+            print(f'{index}) {semester.text}')
     return semesters
 
 
 def get_classes_from_selected_semesters(username, password):
     all_classes = []
     warunki = []
-
     time.sleep(2)
     print('fetching semesters')
     time.sleep(1)
@@ -196,9 +197,9 @@ def get_classes_from_selected_semesters(username, password):
         print('please select correct semester index\n')
     get_classes_from_semester(selected_semester, semesters, warunki,
                               all_classes)
-    if len(warunki) > 0:
+    if len(warunki) == 100:
         for index, warunek in enumerate(warunki):
-            print(str(index) + ') ' + warunek[0])
+            print(f'{index}) {warunek[0]}')
         try:
             selected_semester_index = int(input(
                 'select warunek to exclude(empty excludes none): '))
@@ -218,20 +219,69 @@ def get_classes_from_selected_semesters(username, password):
 
 
 def close_driver():
+    """
+        close driver
+    """
     DRIVER.close()
 
 
-def print_classes_by_day(all_classes):
+def sort_classes_by_day(all_classes):
+    """
+        sorts classes by day
+    """
+    sorted_classes = []
+    for day in DAYS_LOCATIONS:
+        for clas in all_classes:
+            if clas[-1] == day:
+                sorted_classes.append(clas)
+    return sorted_classes
+
+
+def print_classes_by_day(all_classes, sort_classes=False, print_indices=False):
     """
         prints classes day by day
     """
+    os.system('cls' if os.name == 'nt' else 'clear')  # clear screen
+    if sort_classes:
+        sort_classes_by_day(all_classes)
     print('')
     for day in DAYS_LOCATIONS:
         print(day.capitalize())
-        for clas in all_classes:
+        for index, clas in enumerate(all_classes):
             if clas[-1] == day:
-                print(clas[0:-1])
+                if print_indices:
+                    print(f'{index}) {clas[0:-1]}')
+                else:
+                    print(clas[0:-1])
         print('')
+
+
+def remove_classes(all_classes, print_welcome_message=True):
+    """
+        removes all classes selected by user
+    """
+    if print_welcome_message:
+        choice = input('select index to remove, -1 removes all lecutres(W)')
+    else:
+        choice = input()
+    if int(choice) == -1:
+        all_classes = [clss for clss in all_classes if clss[-2] != 'W']
+        print_classes_by_day(
+            all_classes, sort_classes=True, print_indices=True)
+    else:
+        try:
+            all_classes = [clss for index, clss in enumerate(all_classes)
+                           if index != int(choice)]
+            print_classes_by_day(
+                all_classes, sort_classes=True, print_indices=True)
+        except IndexError:
+            print('enter correct index')
+            all_classes = remove_classes(
+                all_classes, print_welcome_message=False)
+    continue_deleting = input('continue removing? [y/N]')
+    if continue_deleting.lower() == 'y':
+        all_classes = remove_classes(all_classes)
+    return all_classes
 
 
 def main(username, password):
