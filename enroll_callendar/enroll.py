@@ -4,7 +4,6 @@ from sys import exit, maxsize
 
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 
 DRIVER = None
@@ -14,7 +13,7 @@ DAYS_LOCATIONS = {}
 # TODO add wait until available based on command line argument
 
 
-def connect():
+def connect(time_to_wait=5):
     """
         establish connection to enroll-me.iiet.pl
     """
@@ -22,8 +21,7 @@ def connect():
     options = Options()
     options.headless = True
     DRIVER = webdriver.Firefox(options=options)
-    # DRIVER.implicitly_wait(5)
-    # DRIVER = webdriver.Firefox()
+    DRIVER.implicitly_wait(time_to_wait)
     print('headless Firefox initialized')
     print('connecting to http://enroll-me.iiet.pl/')
     DRIVER.get('http://enroll-me.iiet.pl/')
