@@ -14,9 +14,9 @@ DAYS_LOCATIONS = {}
 
 
 def connect():
-    '''
+    """
         establish connection to enroll-me.iiet.pl
-    '''
+    """
     global DRIVER
     options = Options()
     options.headless = True
@@ -28,9 +28,9 @@ def connect():
 
 
 def get_day_locations():
-    '''
-        TODO
-    '''
+    """
+        fetches location of all weekdays from enroll-me.iiet.pl
+    """
     global DAYS_LOCATIONS
     DAYS_LOCATIONS['monday'] = {
         'start': int(DRIVER.find_elements_by_class_name(
@@ -76,12 +76,12 @@ def get_day_locations():
 
 
 def find_class_day(class_location):
-    '''
+    """
         class loction is never the same as day location due to responsive
         padding
         finding class's day requires fidning minimum distance from
         class_location to each day_location
-    '''
+    """
     min_distance = maxsize
     class_day = ''
     for day in DAYS_LOCATIONS:
@@ -134,21 +134,21 @@ def get_classes_from_semester(selected_semester, semesters, warunki,
 
 
 def click_enrollment_button():
-    '''
+    """
         return to enrollment page
-    '''
+    """
     enrollment_button = DRIVER.find_element_by_xpath(
         '/html/body/div[1]/div/div[2]/div[2]/a')
     enrollment_button.click()
 
 
 def login(username, password):
-    '''
+    """
         sign in  with accounts.iiet.pl
 
         :username: user's username
         :password: user's password
-    '''
+    """
     sign_in_with_accoutns_iet_button = DRIVER.find_element_by_xpath(
         '/html/body/div[2]/div[2]/form/div[4]/div/div/button[2]')
     sign_in_with_accoutns_iet_button.click()
@@ -219,6 +219,19 @@ def get_classes_from_selected_semesters(username, password):
 
 def close_driver():
     DRIVER.close()
+
+
+def print_classes_by_day(all_classes):
+    """
+        prints classes day by day
+    """
+    print('')
+    for day in DAYS_LOCATIONS:
+        print(day.capitalize())
+        for clas in all_classes:
+            if clas[-1] == day:
+                print(clas[0:-1])
+        print('')
 
 
 def main(username, password):
