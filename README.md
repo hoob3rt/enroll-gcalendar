@@ -68,7 +68,7 @@ optional arguments:
 ### Screenshots
 Default enroll view             |  General View         | Detailed View
 :-------------------------:|:-------------------------:|:--------:
-![default](./screens/enroll.jpg)  |  ![general](./screens/general_view.jpg) | ![detailed](./screens/dedetailed_view.jpg)
+![default](./screens/enroll.jpg)  |  ![general](./screens/general_view.jpg) | ![detailed](./screens/detailed_view.jpg)
 ---
 ### TODO
 * test on google chrome with webdriver
