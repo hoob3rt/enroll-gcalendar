@@ -89,7 +89,7 @@ def convert_to_gcalendar_event(start_date, end_date, lesson):
         convert single lesson into google calendar format
         :lesson: lesson to convert
         :start_date: start date of lesson
-        :end_date: end date of lesson
+        :end_date: end date of semester
     """
     index = next(index for index, key in enumerate(
         DAYS_LOCATIONS) if key == lesson[-1])
@@ -99,10 +99,10 @@ def convert_to_gcalendar_event(start_date, end_date, lesson):
     end_date_date = datetime.datetime.strftime(end_date, "%Y%m%d")
     start_date_start_time = lesson[0].split('-')[0]
     start_date_end_time = lesson[0].split('-')[1]
+    # 4
+    summary = f'{lesson[1]} - {lesson[4]}'
     if lesson[-2] != '':
-        summary = f'{lesson[1]} - {lesson[-2]}'
-    else:
-        summary = lesson[1]
+        summary += f' ({lesson[-2]})'
     event = {
         'summary': f'{summary}',
         'location': f'{lesson[-4]}',

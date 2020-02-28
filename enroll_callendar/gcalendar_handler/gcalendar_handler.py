@@ -60,4 +60,6 @@ def create_event(event, creds):
         Prints the start and name of the next 10 events on the user's calendar.
     """
     service = build('calendar', 'v3', credentials=creds)
+    name = event['summary']
+    print(f'creating {name}')
     event = service.events().insert(calendarId='primary', body=event).execute()
