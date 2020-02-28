@@ -1,3 +1,4 @@
+import datetime
 import os
 import time
 from sys import exit, maxsize
@@ -96,6 +97,32 @@ def find_class_day(class_location):
     return class_day
 
 
+def format_time_to_24_format(date, ttime):
+    diff = DRIVER.find_element_by_class_name('fc-slot20')
+    start = ttime.split('-')[0]
+    end = ttime.split('-')[1]
+    if date.location['y'] < diff.location['y']:
+        s = start.split(':')[0]
+        if len(s) < 2:
+            s = f'0{s}'
+        start = s + ':' + start.split(':')[1]
+    else:
+        s = start.split(':')[0]
+        s = str(12 + int(s))
+        start = s + ':' + start.split(':')[1]
+    if date.location['y']+date.size['height'] < diff.location['y']:
+        s = end.split(':')[0]
+        if len(s) < 2:
+            s = f'0{s}'
+        end = s + ':' + end.split(':')[1]
+    else:
+        s = end.split(':')[0]
+        s = str(12 + int(s))
+        end = s + ':' + end.split(':')[1]
+    ttime = f'{start}-{end}'
+    return ttime
+
+
 def get_classes_from_semester(selected_semester, semesters, warunki,
                               all_classes):
     number = selected_semester[0].split(' ')[0]
@@ -110,14 +137,19 @@ def get_classes_from_semester(selected_semester, semesters, warunki,
     lessons = DRIVER.find_elements_by_class_name('fc-event-inner')
     for lesson in lessons:
         get_day_locations()
-
         head = lesson.find_element_by_class_name('fc-event-head')
-        date = head.find_element_by_class_name('fc-event-time')
         content = lesson.find_element_by_class_name('fc-event-content')
         title = content.find_element_by_class_name('fc-event-title')
-        date = date.text.strip()
+        date = head.find_element_by_class_name('fc-event-time')
+        ttime = date.text.strip().replace(' ', '')
         classname = title.text.split(',')[0].strip()
         dude = title.text.split(',')[1].strip()
+        description = ''
+        if not ttime[-1].isdigit():
+            description = ttime[-1]
+            ttime = (ttime[0:-1])
+        ttime = format_time_to_24_format(date, ttime)
+
         try:
             room = title.text.split(',')[2].strip()
         except IndexError:
@@ -129,8 +161,8 @@ def get_classes_from_semester(selected_semester, semesters, warunki,
         except IndexError:
             class_type = room.split('-')[-1].strip()
             room = room.split('-')[0].strip()
-        all_classes.append((date, classname, dude, room, class_type,
-                            find_class_day(lesson.location['x'])))
+        all_classes.append((ttime, classname, dude, room, class_type,
+                            description, find_class_day(lesson.location['x'])))
 
 
 def click_enrollment_button():
@@ -219,64 +251,9 @@ def get_classes_from_selected_semesters(username, password):
 
 def close_driver():
     """
-        close driver
+        closes driver
     """
     DRIVER.close()
-
-
-def sort_classes_by_day(all_classes):
-    """
-        sorts classes by day
-    """
-    sorted_classes = []
-    for day in DAYS_LOCATIONS:
-        for clas in all_classes:
-            if clas[-1] == day:
-                sorted_classes.append(clas)
-    return sorted_classes
-
-
-def print_classes_by_day(all_classes, sort_classes=False, print_indices=False):
-    """
-        prints classes day by day
-    """
-    os.system('cls' if os.name == 'nt' else 'clear')  # clear screen
-    if sort_classes:
-        sort_classes_by_day(all_classes)
-    print('current plan:\n')
-    for day in DAYS_LOCATIONS:
-        print(day.capitalize())
-        for index, clas in enumerate(all_classes):
-            if clas[-1] == day:
-                if print_indices:
-                    print(f'{index}) {clas[0:-1]}')
-                else:
-                    print(clas[0:-1])
-        print('')
-
-
-def remove_classes(all_classes):
-    """
-        removes all classes selected by user
-    """
-    choice = input('select index to remove, -1 removes all lecutres(W): ')
-    if int(choice) == -1:
-        all_classes = [clss for clss in all_classes if clss[-2] != 'W']
-        print_classes_by_day(
-            all_classes, sort_classes=True, print_indices=True)
-    else:
-        if int(choice) > len(all_classes):
-            print('provided index too big')
-        else:
-            all_classes = [clss for index, clss in enumerate(all_classes)
-                           if index != int(choice)]
-            print_classes_by_day(
-                all_classes, sort_classes=True, print_indices=True)
-
-    continue_deleting = input('continue removing? [y/N]')
-    if continue_deleting.lower() == 'y':
-        all_classes = remove_classes(all_classes)
-    return all_classes
 
 
 def main(username, password):
