@@ -1,29 +1,60 @@
-import datetime
-import os
-import time
-from sys import exit, maxsize
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+    enroll-calendar.enroll
+    ~~~~~~~~~~~~~~~~~~~~~~
+
+    contains plan fetching functions
+
+    :copyright: (c) 2020 by Hubert Pelczarski
+    :license: LICENSE_NAME, see LICENSE for more details.
+"""
+
+import sys
 
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import (NoSuchElementException,
+                                        WebDriverException)
 from selenium.webdriver.firefox.options import Options
 
 DRIVER = None
 DAYS_LOCATIONS = {}
 
 
-# TODO add wait until available based on command line argument
-
-
-def connect(time_to_wait=5):
+def connect(timeout, driver_name=None):
     """
         establish connection to enroll-me.iiet.pl
     """
     global DRIVER
     options = Options()
     options.headless = True
-    DRIVER = webdriver.Firefox(options=options)
-    DRIVER.implicitly_wait(time_to_wait)
-    print('headless Firefox initialized')
+    if driver_name is None:
+        try:
+            DRIVER = webdriver.Firefox(options=options)
+            print('headless Firefox initialized')
+        except WebDriverException:
+            print('firefox geckodriver not found')
+        if DRIVER is None:
+            try:
+                DRIVER = webdriver.Chrome(options=options)
+                print('headless Chrome initialized')
+            except WebDriverException:
+                print('chromedriver not found')
+    elif driver_name == 'chrome':
+        try:
+            DRIVER = webdriver.Chrome(options=options)
+            print('headless Chrome initialized')
+        except WebDriverException:
+            print('chromedriver not found')
+    elif driver_name == 'firefox':
+        try:
+            DRIVER = webdriver.Firefox(options=options)
+            print('headless Firefox initialized')
+        except WebDriverException:
+            print('firefox geckodriver not found')
+    if DRIVER is None:
+        raise Exception('no webdriver find, refer to help or README.md')
+    DRIVER.implicitly_wait(timeout)
     print('connecting to http://enroll-me.iiet.pl/')
     DRIVER.get('http://enroll-me.iiet.pl/')
 
@@ -76,93 +107,107 @@ def get_day_locations():
     }
 
 
-def find_class_day(class_location):
+def find_lesson_day(lesson_location):
     """
-        class loction is never the same as day location due to responsive
+        lesson loction is never the same as day location due to responsive
         padding
-        finding class's day requires fidning minimum distance from
-        class_location to each day_location
+        finding lesson's day requires fidning minimum distance from
+        lesson_location to each day_location
     """
-    min_distance = maxsize
-    class_day = ''
+    min_distance = sys.maxsize
+    lesson_day = ''
     for day in DAYS_LOCATIONS:
         day_location_start = DAYS_LOCATIONS[day]['start']
         day_location_middle = DAYS_LOCATIONS[day]['middle']
-        if abs(day_location_start - class_location) < min_distance:
-            min_distance = abs(day_location_start - class_location)
-            class_day = day
-        if abs(day_location_middle - class_location) < min_distance:
-            min_distance = abs(day_location_middle - class_location)
-            class_day = day
-    return class_day
+        if abs(day_location_start - lesson_location) < min_distance:
+            min_distance = abs(day_location_start - lesson_location)
+            lesson_day = day
+        if abs(day_location_middle - lesson_location) < min_distance:
+            min_distance = abs(day_location_middle - lesson_location)
+            lesson_day = day
+    return lesson_day
 
 
-def format_time_to_24_format(date, ttime):
+def format_time_to_24_format(lesson_time_block):
+    """
+        formats enroll's time format to google's 24h format
+    """
+    lesson_time = lesson_time_block.text.strip().replace(' ', '')
+    description = ''
+    if not lesson_time[-1].isdigit():
+        description = lesson_time[-1]
+        lesson_time = (lesson_time[0:-1])
     diff = DRIVER.find_element_by_class_name('fc-slot20')
-    start = ttime.split('-')[0]
-    end = ttime.split('-')[1]
-    if date.location['y'] < diff.location['y']:
-        s = start.split(':')[0]
-        if len(s) < 2:
-            s = f'0{s}'
-        start = s + ':' + start.split(':')[1]
+    starting_hour = lesson_time.split('-')[0]
+    ending_hour = lesson_time.split('-')[1]
+
+    # start of enroll square
+    if lesson_time_block.location['y'] < diff.location['y']:
+        hour = starting_hour.split(':')[0]
+        if len(hour) < 2:
+            hour = f'0{hour}'
+        starting_hour = hour + ':' + starting_hour.split(':')[1]
     else:
-        s = start.split(':')[0]
-        s = str(12 + int(s))
-        start = s + ':' + start.split(':')[1]
-    if date.location['y']+date.size['height'] < diff.location['y']:
-        s = end.split(':')[0]
-        if len(s) < 2:
-            s = f'0{s}'
-        end = s + ':' + end.split(':')[1]
+        hour = starting_hour.split(':')[0]
+        hour = str(12 + int(hour))
+        starting_hour = hour + ':' + starting_hour.split(':')[1]
+
+    # end of enroll square
+    if (lesson_time_block.location['y']+lesson_time_block.size['height'] <
+            diff.location['y']):
+        hour = ending_hour.split(':')[0]
+        if len(hour) < 2:
+            hour = f'0{hour}'
+        ending_hour = hour + ':' + ending_hour.split(':')[1]
     else:
-        s = end.split(':')[0]
-        s = str(12 + int(s))
-        end = s + ':' + end.split(':')[1]
-    ttime = f'{start}-{end}'
-    return ttime
+        hour = ending_hour.split(':')[0]
+        hour = str(12 + int(hour))
+        ending_hour = hour + ':' + ending_hour.split(':')[1]
+    lesson_time = f'{starting_hour}-{ending_hour}'
+    return lesson_time, description
 
 
-def get_classes_from_semester(selected_semester, semesters, warunki,
-                              all_classes):
+def get_lessons_from_semester(selected_semester, semesters, overdue_lessons,
+                              all_lessons):
+    """
+        fetches all lessons from selected semester
+    """
     number = selected_semester[0].split(' ')[0]
     for index in semesters:
         if semesters[index][0].split(
                 ' ')[0] == number and int(semesters[index][0].split(
                     ' ')[1]) == int(selected_semester[0].split(' ')[1])-2:
-            warunki.append((semesters[index][0], semesters[index][1]))
-    btn = selected_semester[1].find_elements_by_css_selector('td')[-1]
-    b = btn.find_element_by_css_selector('div')
-    b.click()
+            overdue_lessons.append((semesters[index][0], semesters[index][1]))
+    semester_buttons = selected_semester[1].find_elements_by_css_selector(
+        'td')[-1]
+    your_schedule_button = semester_buttons.find_element_by_css_selector('div')
+    your_schedule_button.click()
     lessons = DRIVER.find_elements_by_class_name('fc-event-inner')
     for lesson in lessons:
         get_day_locations()
-        head = lesson.find_element_by_class_name('fc-event-head')
-        content = lesson.find_element_by_class_name('fc-event-content')
-        title = content.find_element_by_class_name('fc-event-title')
-        date = head.find_element_by_class_name('fc-event-time')
-        ttime = date.text.strip().replace(' ', '')
-        classname = title.text.split(',')[0].strip()
-        dude = title.text.split(',')[1].strip()
-        description = ''
-        if not ttime[-1].isdigit():
-            description = ttime[-1]
-            ttime = (ttime[0:-1])
-        ttime = format_time_to_24_format(date, ttime)
+        lesson_header = lesson.find_element_by_class_name('fc-event-head')
+        lesson_content = lesson.find_element_by_class_name('fc-event-content')
 
+        title = lesson_content.find_element_by_class_name('fc-event-title')
+        lessonname = title.text.split(',')[0].strip()
+        lecturer = title.text.split(',')[1].strip()
+        lesson_time_block = lesson_header.find_element_by_class_name(
+            'fc-event-time')
+        lesson_time, description = format_time_to_24_format(lesson_time_block)
         try:
             room = title.text.split(',')[2].strip()
         except IndexError:
-            room = dude
-            dude = ''
+            room = lecturer
+            lecturer = ''
         try:
-            class_type = title.text.split(
+            lesson_type = title.text.split(
                 ',')[3].strip().split('-')[-1].strip()
         except IndexError:
-            class_type = room.split('-')[-1].strip()
+            lesson_type = room.split('-')[-1].strip()
             room = room.split('-')[0].strip()
-        all_classes.append((ttime, classname, dude, room, class_type,
-                            description, find_class_day(lesson.location['x'])))
+        all_lessons.append((lesson_time, lessonname, lecturer, room,
+                            lesson_type, description,
+                            find_lesson_day(lesson.location['x'])))
 
 
 def click_enrollment_button():
@@ -176,7 +221,7 @@ def click_enrollment_button():
     except NoSuchElementException:
         print(
             'fetching semesters failed, possibly due to wrong login info')
-        exit(1)
+        sys.exit(1)
 
 
 def login(username, password):
@@ -199,6 +244,9 @@ def login(username, password):
 
 
 def fetch_available_semesters(print_available_semesters=False):
+    """
+        fetches all available semesters from enrollment page
+    """
     all_plans = DRIVER.find_element_by_xpath(
         '//*[@id="mainForm:j_id_x:tbody_element"]')
     rows = all_plans.find_elements_by_css_selector('tr')
@@ -212,9 +260,12 @@ def fetch_available_semesters(print_available_semesters=False):
     return semesters
 
 
-def get_classes_from_selected_semesters(username, password):
-    all_classes = []
-    warunki = []
+def get_lessons_from_selected_semesters(username, password):
+    """
+        fetches all lessons from selected semesters
+    """
+    all_lessons = []
+    overdue_lessons = []
     print('fetching semesters')
     login(username, password)
     click_enrollment_button()
@@ -227,26 +278,27 @@ def get_classes_from_selected_semesters(username, password):
         selected_semester = list(semesters.values())[selected_semester_index]
     except IndexError:
         print('please select correct semester index\n')
-    get_classes_from_semester(selected_semester, semesters, warunki,
-                              all_classes)
-    if len(warunki) > 0:
-        for index, warunek in enumerate(warunki):
-            print(f'{index}) {warunek[0]}')
+    get_lessons_from_semester(selected_semester, semesters, overdue_lessons,
+                              all_lessons)
+    if len(overdue_lessons) > 0:
+        for index, overdue_lesson in enumerate(overdue_lessons):
+            print(f'{index}) {overdue_lesson[0]}')
         try:
             selected_semester_index = int(input(
-                'select warunek to exclude(empty excludes none): '))
+                'select overdue_lesson to exclude(empty excludes none): '))
         except ValueError:
             selected_semester_index = None
         if selected_semester_index is not None:
-            del warunki[selected_semester_index]
+            del overdue_lessons[selected_semester_index]
         click_enrollment_button()
         semesters = fetch_available_semesters()
-        for warunek in warunki:
+        for overdue_lesson in overdue_lessons:
             for semester in semesters:
-                if warunek[0] == semesters[semester][0]:
-                    get_classes_from_semester(semesters[semester],
-                                              semesters, warunki, all_classes)
-    return all_classes
+                if overdue_lesson[0] == semesters[semester][0]:
+                    get_lessons_from_semester(semesters[semester],
+                                              semesters, overdue_lessons,
+                                              all_lessons)
+    return all_lessons
 
 
 def close_driver():
@@ -254,9 +306,3 @@ def close_driver():
         closes driver
     """
     DRIVER.close()
-
-
-def main(username, password):
-    connect()
-    get_classes_from_selected_semesters(username, password)
-    close_driver()
