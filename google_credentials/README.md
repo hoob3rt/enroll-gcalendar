@@ -1,1 +1,1 @@
-# [Place](place) your google credentials here
+# Place your google credentials here
