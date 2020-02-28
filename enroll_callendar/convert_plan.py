@@ -34,10 +34,10 @@ def convert_plan():
     else:
         connect(timeout)
     if username is None:
-        username = input('enter username: ')
+        username = input('enter enroll username: ')
     else:
         print(f'username: {username}')
-    password = getpass('enter password: ')
+    password = getpass('enter enroll password: ')
     all_lessons = get_lessons_from_selected_semesters(username, password)
     print_lessons_by_day(all_lessons, sort_lessons=True, print_indices=True)
     remove = input('do you want to remove any lessons?[y/N] ')
@@ -79,7 +79,7 @@ def setup_cli():
                         help=('timeout for fetches, set hight value with '
                               'slower connections (default: 5)'))
     parser.add_argument('-u', '--username',
-                        help=('provide username before running script'))
+                        help=('provide enroll username before running script'))
     parser.add_argument('-d', '--driver',
                         help=('choose driver before running script '
                               '(available values: chrome, firefox)'))
