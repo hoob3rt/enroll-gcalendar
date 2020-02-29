@@ -1,8 +1,8 @@
-# enroll-calendar
+# enroll-gcalendar
 ![release](https://img.shields.io/github/v/release/hoob3rt/enroll-calendar)&nbsp;
 
 Convert enroll-me.iiet.pl schedules to google calendar for CS IET students
-##### enroll-calendar will soon be available on pip servers
+##### enroll-gcalendar is now available on pypi servers!
 ---
 ### Content
 ##### 1. Features
@@ -33,21 +33,33 @@ Convert enroll-me.iiet.pl schedules to google calendar for CS IET students
 * google-calendar credentials in google_credentials directory
 ---
 ### Installation
-* ```git clone https://github.com/hoob3rt/enroll-calendar.git```
-* ```sudo pip install -r requirements.txt ```
+* ```pip install enroll-gcalendar ```
 * install geckodriver for firefox [here](https://github.com/mozilla/geckodriver/releases)
     * if you are on arch linux simply run ```yay -S geckodriver```
 * alternatively install webdriver for chrome [here](https://chromedriver.chromium.org/downloads)
     * if you are on arch linux simply run ```yay -S webdriver```
 * enable google-calendar-api for your account & download credentials.json
   [explained in the first 2 steps here](https://dev.to/megazear7/google-calendar-api-integration-made-easy-2a68)
-* place credentials.json in google_credentials directory
+* place credentials.json in ../google_credentials directory or anywhere else & provide path to script
 ---
 ### Usage
-run ```python enroll-calendar/convert_plan.py```
+1. if cloning from git:
+* place your google_credentials in google_credentials directory
+* run ```python enroll-gcalendar/convert_plan.py```
+2. if installing from pip
+* create a simple script
+```python
+import enroll_gcalendar
+enroll_gcalendar.convert_plan()
+```
+* run created script with proper path to google_credentials
+```console
+python script.py --path your_path
+```
+
 available cl arguments:
 ````
-usage: convert_plan.py [-h] [-t TIMEOUT] [-u USERNAME] [-d DRIVER] [-s START_DATE] [-e END_DATE] [-dr]
+usage: test.py [-h] [-t TIMEOUT] [-u USERNAME] [-d DRIVER] [-s START_DATE] [-e END_DATE] [-p PATH] [-dr]
 
 Convert enroll plan to google calendar
 
@@ -63,8 +75,8 @@ optional arguments:
                         choose start_date before running script (format: YYYY-MM-DD)
   -e END_DATE, --end-date END_DATE
                         choose end_date before running script (format: YYYY-MM-DD)
+  -p PATH, --path PATH  provide credentials path
   -dr, --dry-run        run script without convertion
-
 ````
 ---
 ### Screenshots
