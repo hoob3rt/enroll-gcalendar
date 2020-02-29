@@ -29,7 +29,7 @@ def evaluate_credentials():
     """
     creds = None
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    rel_path = '../../google_credentials'
+    rel_path = '../google_credentials'
     abs_file_path = os.path.join(script_dir, rel_path)
     if os.path.exists(os.path.join(abs_file_path, 'token.pickle')):
         with open(os.path.join(abs_file_path, 'token.pickle'), 'rb') as token:
