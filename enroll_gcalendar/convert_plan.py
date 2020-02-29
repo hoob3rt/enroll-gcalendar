@@ -28,8 +28,9 @@ def convert_plan():
     """
         converts enroll plan to google calendar
     """
-    timeout, username, driver, start_date, end_date, dry_run = setup_cli()
-    creds = evaluate_credentials()
+    (timeout, username, driver, start_date, end_date, path,
+     dry_run) = setup_cli()
+    creds = evaluate_credentials(path)
     if timeout is None or not timeout.isdigit():
         timeout = 5
     if driver in ('chrome', 'firefox'):
@@ -92,11 +93,13 @@ def setup_cli():
     parser.add_argument('-e', '--end-date',
                         help=('choose end_date before running script '
                               '(format: YYYY-MM-DD)'))
+    parser.add_argument('-p', '--path',
+                        help=('provide credentials path'))
     parser.add_argument('-dr', '--dry-run', default=False, action='store_true',
                         help=('run script without convertion'))
     args = parser.parse_args()
     return (args.timeout, args.username, args.driver, args.start_date,
-            args.end_date, args.dry_run)
+            args.end_date, args.path, args.dry_run)
 
 
 if __name__ == "__main__":
