@@ -54,11 +54,7 @@ def evaluate_credentials(path=None):
     """
     creds = None
     if path is None:
-        rel_path = '../google_credentials'
-    else:
-        rel_path = path
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    path = os.path.join(script_dir, rel_path)
+        path = '../google_credentials'
     creds = get_credentials(path)
     return creds
 
