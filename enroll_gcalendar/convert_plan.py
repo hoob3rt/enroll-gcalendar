@@ -15,10 +15,13 @@ import datetime
 import sys
 from getpass import getpass
 
-import gcalendar_handler
-from enroll import close_driver, connect, get_lessons_from_selected_semesters
-from schedule_preparator import (convert_to_gcalendar_event,
-                                 print_lessons_by_day, remove_lessons)
+from enroll_gcalendar.enroll import (close_driver, connect,
+                                     get_lessons_from_selected_semesters)
+from enroll_gcalendar.gcalendar_handler import (create_event,
+                                                evaluate_credentials)
+from enroll_gcalendar.schedule_preparator import (convert_to_gcalendar_event,
+                                                  print_lessons_by_day,
+                                                  remove_lessons)
 
 
 def convert_plan():
@@ -26,7 +29,7 @@ def convert_plan():
         converts enroll plan to google calendar
     """
     timeout, username, driver, start_date, end_date, dry_run = setup_cli()
-    creds = gcalendar_handler.evaluate_credentials()
+    creds = evaluate_credentials()
     if timeout is None or not timeout.isdigit():
         timeout = 5
     if driver in ('chrome', 'firefox'):
@@ -64,7 +67,7 @@ def convert_plan():
                 except ValueError:
                     print('wrong start or end date format')
                     sys.exit(1)
-                gcalendar_handler.create_event(event, creds)
+                create_event(event, creds)
 
     close_driver()
 

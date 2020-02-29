@@ -13,7 +13,7 @@
 import datetime
 import os
 
-from enroll import DAYS_LOCATIONS
+from enroll_gcalendar.enroll import DAYS_LOCATIONS
 
 
 def sort_lessons_by_day(all_lessons):
