@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name='enroll_gcalendar',
     packages=['enroll_gcalendar'],
-    version='0.4.1',
+    version='0.5',
     license='MIT',
     description='Convert enroll-me.iiet.pl schedules to google calendar for CS IET students',
     author='Hubert Pelczarski',
