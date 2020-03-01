@@ -56,6 +56,10 @@ enroll_gcalendar.convert_plan()
 ```console
 python script.py --path your_path_to_dir
 ```
+e.g.
+```console
+python script.py -p ~/downloads
+```
 
 available cl arguments:
 ````
