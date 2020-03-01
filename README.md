@@ -30,7 +30,7 @@ Convert enroll-me.iiet.pl schedules to google calendar for CS IET students
 * requirements.txt
 * firefox with geckodriver(recommended) or google chrome with webdriver
 * google-calendar-api-enabled google account
-* google-calendar credentials in google_credentials directory
+* google calendar credentials (credentials.json) downloaded from google
 ---
 ### Installation
 * ```pip install enroll-gcalendar ```
