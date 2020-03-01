@@ -3,6 +3,7 @@
 
 Convert enroll-me.iiet.pl schedules to google calendar for CS IET students
 ##### enroll-gcalendar is now available on pypi servers!
+##### now works on both firefox & chrome
 ---
 ### Content
 ##### 1. Features
@@ -23,12 +24,11 @@ Convert enroll-me.iiet.pl schedules to google calendar for CS IET students
 * may not work if you have more than 3 classes at the same hour in the same day
 * no colors for classes (yet)
 * weeks A/B constantly change therefore they happen weekly on google calendar
-* #### Not tested on google chrome
 ---
 ### Requirements
 * python 3.8>=
 * requirements.txt
-* firefox with geckodriver(recommended) or google chrome with webdriver
+* firefox with geckodriver or google chrome with webdriver
 * google-calendar-api-enabled google account
 * google calendar credentials (credentials.json) downloaded from google
 ---
@@ -89,5 +89,4 @@ Default enroll view             |  General View         | Detailed View
 ![default](./screens/enroll.jpg)  |  ![general](./screens/general_view.jpg) | ![detailed](./screens/detailed_view.jpg)
 ---
 ### TODO
-* test on google chrome with webdriver
 * add different colors for classes

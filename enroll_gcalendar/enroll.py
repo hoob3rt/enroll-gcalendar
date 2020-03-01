@@ -12,10 +12,11 @@
 
 import sys
 
+import selenium.webdriver.firefox
+import selenium.webdriver.chrome
 from selenium import webdriver
 from selenium.common.exceptions import (NoSuchElementException,
                                         WebDriverException)
-from selenium.webdriver.firefox.options import Options
 
 DRIVER = None
 DAYS_LOCATIONS = {}
@@ -26,34 +27,40 @@ def connect(timeout, driver_name=None):
         establish connection to enroll-me.iiet.pl
     """
     global DRIVER
-    options = Options()
-    options.headless = True
     if driver_name is None:
         try:
+            options = selenium.webdriver.firefox.options.Options()
+            options.headless = True
             DRIVER = webdriver.Firefox(options=options)
             print('headless Firefox initialized')
         except WebDriverException:
             print('firefox geckodriver not found')
         if DRIVER is None:
             try:
+                options = selenium.webdriver.chrome.options.Options()
+                options.headless = True
                 DRIVER = webdriver.Chrome(options=options)
                 print('headless Chrome initialized')
             except WebDriverException:
                 print('chromedriver not found')
     elif driver_name == 'chrome':
         try:
+            options = selenium.webdriver.chrome.options.Options()
+            options.headless = True
             DRIVER = webdriver.Chrome(options=options)
             print('headless Chrome initialized')
         except WebDriverException:
             print('chromedriver not found')
     elif driver_name == 'firefox':
         try:
+            options = selenium.webdriver.firefox.options.Options()
+            options.headless = True
             DRIVER = webdriver.Firefox(options=options)
             print('headless Firefox initialized')
         except WebDriverException:
             print('firefox geckodriver not found')
     if DRIVER is None:
-        raise Exception('no webdriver find, refer to help or README.md')
+        raise Exception('no webdriver found, refer to help or README.md')
     DRIVER.implicitly_wait(timeout)
     print('connecting to http://enroll-me.iiet.pl/')
     DRIVER.get('http://enroll-me.iiet.pl/')
@@ -285,7 +292,7 @@ def get_lessons_from_selected_semesters(username, password):
             print(f'{index}) {overdue_lesson[0]}')
         try:
             selected_semester_index = int(input(
-                'select overdue_lesson to exclude(empty excludes none): '))
+                'select overdue semester to exclude(empty excludes none): '))
         except ValueError:
             selected_semester_index = None
         if selected_semester_index is not None:
