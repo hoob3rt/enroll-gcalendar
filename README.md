@@ -17,7 +17,7 @@ Convert enroll-me.iiet.pl schedules to google calendar for CS IET students
 * convert enroll plan to google calendar
 * add overdue classes from last year to the same plan
 * remove classes which don't interest you
-* remove all lectures from plan at once (SKIP GANG)
+* remove all lectures from plan at once
 ---
 ### Disadvantages
 * may not work if you have more than 3 classes at the same hour in the same day
@@ -44,7 +44,7 @@ Convert enroll-me.iiet.pl schedules to google calendar for CS IET students
 ---
 ### Usage
 1. if cloning from git:
-* place your google_credentials in google_credentials directory
+* place your credentials.json in google_credentials directory
 * run ```python enroll-gcalendar/convert_plan.py```
 2. if installing from pip
 * create a simple script
@@ -52,9 +52,9 @@ Convert enroll-me.iiet.pl schedules to google calendar for CS IET students
 import enroll_gcalendar
 enroll_gcalendar.convert_plan()
 ```
-* run created script with proper path to google_credentials
+* run created script with proper path to directory containing credentials.json
 ```console
-python script.py --path your_path
+python script.py --path your_path_to_dir
 ```
 
 available cl arguments:
