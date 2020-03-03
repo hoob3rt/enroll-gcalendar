@@ -1,6 +1,9 @@
 # enroll-gcalendar
 ![release](https://img.shields.io/github/v/release/hoob3rt/enroll-gcalendar)&nbsp;
 
+
+[![HitCount](http://hits.dwyl.com/hoob3rt/enroll-gcalendar.svg)](http://hits.dwyl.com/hoob3rt/enroll-gcalendar)
+
 Convert enroll-me.iiet.pl schedules to google calendar for CS IET students
 ##### enroll-gcalendar is now available on pypi servers!
 ##### now works on both firefox & chrome
