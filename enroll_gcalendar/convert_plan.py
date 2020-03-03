@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-    enroll-calendar.convert_plan
+    enroll-gcalendar.convert_plan
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     sets up cli & contains main convertion function
 
     :copyright: (c) 2020 by Hubert Pelczarski
-    :license: LICENSE_NAME, see LICENSE for more details.
+    :license: MIT, see LICENSE for more details.
 """
 
 import argparse

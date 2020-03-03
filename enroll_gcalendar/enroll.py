@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-    enroll-calendar.enroll
+    enroll-gcalendar.enroll
     ~~~~~~~~~~~~~~~~~~~~~~
 
     contains plan fetching functions
 
     :copyright: (c) 2020 by Hubert Pelczarski
-    :license: LICENSE_NAME, see LICENSE for more details.
+    :license: MIT, see LICENSE for more details.
 """
 
 import sys

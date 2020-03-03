@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-    enroll_calendar.__init__
+    enroll_gcalendar.__init__
     ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2020 by Hubert Pelczarski.

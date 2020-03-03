@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-    enroll-calendar.schedule_preparator
+    enroll-gcalendar.schedule_preparator
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     set of functions preparing for conversion to google calendar
 
     :copyright: (c) 2020 by Hubert Pelczarski
-    :license: LICENSE_NAME, see LICENSE for more details.
+    :license: MIT, see LICENSE for more details.
 """
 
 import datetime

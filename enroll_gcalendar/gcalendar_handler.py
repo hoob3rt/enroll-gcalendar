@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-    enroll-calendar.gcalendar_handler.gcalendar_handler
+    enroll-gcalendar.gcalendar_handler
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2020 by Hubert Pelczarski
-    :license: LICENSE_NAME, see LICENSE for more details.
+    :license: MIT, see LICENSE for more details.
 """
 
 import os.path
@@ -20,6 +20,13 @@ SCOPES = ['https://www.googleapis.com/auth/calendar.events']
 
 
 def get_credentials(path):
+    """
+        check existance of google credentials
+
+        The file token.pickle stores the user's access and refresh tokens,
+        and is created automatically when the authorization flow completes
+        for the first time.
+    """
     creds = None
     if os.path.exists(os.path.join(path, 'token.pickle')):
         with open(os.path.join(path, 'token.pickle'), 'rb') as token:
@@ -46,11 +53,7 @@ def get_credentials(path):
 
 def evaluate_credentials(path=None):
     """
-        check existance of google credentials
-
-        The file token.pickle stores the user's access and refresh tokens,
-        and is created automatically when the authorization flow completes
-        for the first time.
+        fetch google credentials from provided path
     """
     creds = None
     if path is None:
@@ -61,8 +64,7 @@ def evaluate_credentials(path=None):
 
 def create_event(event, creds):
     """
-        Shows basic usage of the Google Calendar API.
-        Prints the start and name of the next 10 events on the user's calendar.
+        creates google calendar event
     """
     service = build('calendar', 'v3', credentials=creds)
     name = event['summary']
