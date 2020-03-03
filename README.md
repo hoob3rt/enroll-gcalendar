@@ -37,7 +37,7 @@ Convert enroll-me.iiet.pl schedules to google calendar for CS IET students
 * install geckodriver for firefox [here](https://github.com/mozilla/geckodriver/releases)
     * if you are on arch linux simply run ```yay -S geckodriver```
 * alternatively install webdriver for chrome [here](https://chromedriver.chromium.org/downloads)
-    * if you are on arch linux simply run ```yay -S webdriver```
+    * if you are on arch linux simply run ```yay -S chromedriver```
 * enable google-calendar-api for your account & download credentials.json
   [explained in the first 2 steps here](https://dev.to/megazear7/google-calendar-api-integration-made-easy-2a68)
 * place credentials.json in ../google_credentials directory or anywhere else & provide path to script
